@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Countdown to Sleep</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(to bottom, #2c3e50, #34495e);
+      color: #ecf0f1;
+      text-align: center;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+    }
+    #countdown {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px 25px;
+      border-radius: 15px;
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.6);
+      transition: all 0.3s ease;
+    }
+    #message {
+      font-size: 3rem;
+      color: #27ae60;
+      display: none;
+      opacity: 0;
+      animation: fadeInUp 2s ease-in-out forwards;
+    }
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .snowflake {
+      position: absolute;
+      top: -10px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0% {
+        transform: translateY(0px);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Countdown to 10 PM</h1>
+  <div id="countdown">Loading...</div>
+  <div id="message">Finaly we can fucking sleep bro 💀😭🙏</div>
+
+  <script>
+    function calculateTimeDifference(targetHour, targetMinute, targetSecond) {
+      const now = new Date();
+      const targetTime = new Date();
+      targetTime.setHours(targetHour, targetMinute, targetSecond, 0);
+
+      if (targetTime < now) {
+        targetTime.setDate(targetTime.getDate() + 1);
+      }
+
+      const diff = targetTime - now;
+      return {
+        hours: Math.floor(diff / (1000 * 60 * 60)),
+        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((diff % (1000 * 60)) / 1000),
+      };
+    }
+
+    function startCountdown() {
+      const targetHour = 22;
+      const targetMinute = 0;
+      const targetSecond = 0;
+
+      const countdownElement = document.getElementById("countdown");
+      const messageElement = document.getElementById("message");
+
+      function updateCountdown() {
+        const { hours, minutes, seconds } = calculateTimeDifference(
+          targetHour,
+          targetMinute,
+          targetSecond
+        );
+
+        if (hours <= 0 && minutes <= 0 && seconds <= 0) {
+          clearInterval(countdownInterval);
+          countdownElement.style.display = "none";
+          messageElement.style.display = "block";
+          localStorage.setItem("timerFinished", "true");
+          return;
+        }
+
+        countdownElement.textContent = `${hours}h ${minutes}m ${seconds}s`;
+      }
+
+      updateCountdown();
+      const countdownInterval = setInterval(updateCountdown, 1000);
+    }
+
+    function checkTimerState() {
+      const timerFinished = localStorage.getItem("timerFinished");
+      if (timerFinished === "true") {
+        document.getElementById("countdown").style.display = "none";
+        const messageElement = document.getElementById("message");
+        messageElement.style.display = "block";
+      } else {
+        startCountdown();
+      }
+    }
+
+    function createSnowflakes() {
+      const snowflakeCount = 100;
+      const body = document.body;
+
+      for (let i = 0; i < snowflakeCount; i++) {
+        const snowflake = document.createElement("div");
+        snowflake.classList.add("snowflake");
+        const size = Math.random() * 5 + 2;
+        const left = Math.random() * 100;
+        const duration = Math.random() * 5 + 5;
+        const delay = Math.random() * 5;
+
+        snowflake.style.width = `${size}px`;
+        snowflake.style.height = `${size}px`;
+        snowflake.style.left = `${left}%`;
+        snowflake.style.animationDuration = `${duration}s`;
+        snowflake.style.animationDelay = `${delay}s`;
+
+        body.appendChild(snowflake);
+      }
+    }
+
+    createSnowflakes();
+    checkTimerState();
+  </script>
+</body>
+</html>
